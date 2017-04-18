@@ -51,7 +51,7 @@ ui <- fluidPage(
     column(
       width = 5, offset = 1,
       sliderInput("year", "Year", value = 1984, min = 1960, max = 2014, 
-                  width = "100%", step = 1, ticks=FALSE,
+                  width = "100%", step = 1, ticks=FALSE, sep = '',
                   animate = animationOptions(interval = 500)))
     )
 )
