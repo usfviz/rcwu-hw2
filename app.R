@@ -1,25 +1,22 @@
-rm(list = ls())
-cat('\014')
+if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("ggvis")) install.packages("ggvis")
+if (!require("shiny")) install.packages("shiny")
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("tidyr")) install.packages("tidyr")
 
-library(ggplot2)
-library(ggvis)
-library(shiny)
-library(dplyr)
-library(reshape2)
 
-# setwd('~/Desktop/MSAN622/Homework/HW2/')
 # Read in the base data sets, drop unnecessary columns, melt tables for ggplot
 life <- read.csv('life_expect.csv', stringsAsFactors = F) %>%
   select(-Indicator.Name, -Indicator.Code, -X2015, -X2016) %>%
-  melt(variable = 'year', value.name = 'life_expectancy')
+  gather(key = year, value = life_expectancy, -Country.Name, -Country.Code)
 
 fert <- read.csv('fert.csv', stringsAsFactors = F) %>%
   select(-Country.Code, -Indicator.Name, -Indicator.Code, -X2015, -X2016) %>%
-  melt(variable = 'year', value.name = 'fertility_rate')
+  gather(key = year, value = fertility_rate, -Country.Name)
 
 pop <- read.csv('population.csv', stringsAsFactors = F) %>%
   select(-Country.Code, -Indicator.Name, -Indicator.Code, -X2015, -X2016) %>%
-  melt(variable = 'year', value.name = 'population')
+  gather(key = year, value = population, -Country.Name)
 
 meta <- read.csv('meta_data.csv', stringsAsFactors = F) %>% 
   select(Country.Code, Region) 
@@ -31,6 +28,7 @@ dat <- left_join(fert, life, by = c('Country.Name', 'year')) %>%
   filter(Region != '', !is.na(Region)) %>%
   mutate(year = as.numeric(substring(year, 2)))
 
+# Drop NAs, add ID and opacity for ggvis
 dat <- dat[complete.cases(dat), ] %>%
   mutate(id = 1:length(year),
          opacity = 1)
